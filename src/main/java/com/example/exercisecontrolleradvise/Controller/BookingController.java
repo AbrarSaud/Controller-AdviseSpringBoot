@@ -28,14 +28,8 @@ public class BookingController {
     //(Endpoints #16)  Add new booking.
     //  check if user and gym class exist. If both exist and capacity > 0,  decrease capacity by 1 and save the booking.
     @PostMapping("/add")
-    public ResponseEntity<?> addBooking(@Valid @RequestBody Booking booking, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(errors.getFieldError().getDefaultMessage());
-        }
-        Boolean isAdded = bookingService.addBooking(booking);
-        if (!isAdded) {
-            return ResponseEntity.status(404).body(new ApiResponse("User or GymClass not found or no capacity."));
-        }
+    public ResponseEntity<?> addBooking(@Valid @RequestBody Booking booking) {
+        bookingService.addBooking(booking);
         return ResponseEntity.status(200).body(new ApiResponse("Booking added!"));
     }
 
@@ -43,10 +37,7 @@ public class BookingController {
     //  check if booking exists and  If booking exists,  increase gym class capacity by 1 and delete the booking.
     @DeleteMapping("/delete/{booking_id}")
     public ResponseEntity<?> deleteBooking(@PathVariable Integer booking_id) {
-        Boolean isDeleted = bookingService.deleteBooking(booking_id);
-        if (!isDeleted) {
-            return ResponseEntity.status(404).body(new ApiResponse("Booking not found!"));
-        }
+        bookingService.deleteBooking(booking_id);
         return ResponseEntity.status(200).body(new ApiResponse("Booking deleted !"));
     }
 
@@ -60,10 +51,7 @@ public class BookingController {
     // (Endpoints #19) Change user from old gym class to new gym class.
     @PutMapping("/change/{userId}/{oldGymClassId}/{newGymClassId}")
     public ResponseEntity<?> changeUserGymClass(@PathVariable Integer userId, @PathVariable Integer oldGymClassId, @PathVariable Integer newGymClassId) {
-        Boolean isChanged = bookingService.changeUserGymClass(userId, oldGymClassId, newGymClassId);
-        if (!isChanged) {
-            return ResponseEntity.status(404).body(new ApiResponse("Failed to change gym class!"));
-        }
+        bookingService.changeUserGymClass(userId, oldGymClassId, newGymClassId);
         return ResponseEntity.ok(new ApiResponse("Successfully changed gym class!"));
     }
 

@@ -1,6 +1,7 @@
 package com.example.exercisecontrolleradvise.Service;
 
 
+import com.example.exercisecontrolleradvise.Api.ApiException;
 import com.example.exercisecontrolleradvise.Model.Coach;
 import com.example.exercisecontrolleradvise.Model.User;
 import com.example.exercisecontrolleradvise.Repository.CoachRepository;
@@ -23,19 +24,18 @@ public class CoachService {
     }
 
     //     Add a new Coach
-    public Boolean addCoach(Coach coach) {
+    public void addCoach(Coach coach) {
         if (coach == null) {
-            return false;
+            throw new ApiException("Coach not be added!");
         }
         coachRepository.save(coach);
-        return true;
     }
 
     //     Update a Coach
-    public Boolean updateCoach(Integer coach_id, Coach coach) {
+    public void updateCoach(Integer coach_id, Coach coach) {
         Coach oldCoach = coachRepository.findCoachByCoachId(coach_id);
         if (oldCoach == null) {
-            return false;
+            throw new ApiException("Coach not be added!");
         }
         oldCoach.setName(coach.getName());
         if (coach.getEmail() != null) {
@@ -45,17 +45,15 @@ public class CoachService {
 
         oldCoach.setYearsOfExperience(coach.getYearsOfExperience());
         coachRepository.save(oldCoach);
-        return true;
     }
 
     //     Delete a Coach
-    public Boolean deleteCoach(Integer coach_id) {
+    public void deleteCoach(Integer coach_id) {
         Coach deleteCoach = coachRepository.findCoachByCoachId(coach_id);
         if (deleteCoach == null) {
-            return false;
+            throw new ApiException("Coach not be added!");
         }
         coachRepository.delete(deleteCoach);
-        return true;
     }
 
     // (Endpoints #4) Show the best coaches (ordered by experience )
@@ -71,14 +69,14 @@ public class CoachService {
             coachRepository.save(coach);
             return coach;
         }
-        return null;
+        throw new ApiException("Coach not be updated!");
     }
 
     // (Endpoints #6) Promote user to coach , change a user to a coach.(save new coach, and delete user.)
-    public boolean promoteUserToCoach(Integer userId) {
+    public void promoteUserToCoach(Integer userId) {
         User user = userRepository.findUserByUserId(userId);
         if (user == null) {
-            return false;
+            throw new ApiException("User Not found");
         }
         Coach coach = new Coach();
         coach.setName(user.getName());
@@ -87,6 +85,5 @@ public class CoachService {
         coach.setYearsOfExperience(0);
         coachRepository.save(coach);
         userRepository.delete(user);
-        return true;
     }
 }

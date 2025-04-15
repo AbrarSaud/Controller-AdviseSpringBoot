@@ -26,48 +26,29 @@ public class GymClassController {
 
     //     Add a new GymClass
     @PostMapping("/add")
-    public ResponseEntity<?> addGymClass(@Valid @RequestBody GymClass gymClass, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(errors.getFieldError().getDefaultMessage());
-        }
-        boolean isAdded = gymClassService.addGymClass(gymClass);
-
-        if (!isAdded) {
-            return ResponseEntity.status(404).body(new ApiResponse("Coach not found"));
-        }
+    public ResponseEntity<?> addGymClass(@Valid @RequestBody GymClass gymClass) {
+        gymClassService.addGymClass(gymClass);
         return ResponseEntity.status(200).body(new ApiResponse("GymClass added !!"));
     }
 
     //     Update GymClass
     @PutMapping("/update/{gymClass_id}")
-    public ResponseEntity<?> updateGymClass(@PathVariable Integer gymClass_id, @Valid @RequestBody GymClass gymClass, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(errors.getFieldError().getDefaultMessage());
-        }
-        Boolean isUpdate = gymClassService.updateGymClass(gymClass_id, gymClass);
-        if (isUpdate) {
-            return ResponseEntity.status(200).body(new ApiResponse("GymClass Update"));
-        }
-        return ResponseEntity.status(404).body(new ApiResponse("Not found"));
+    public ResponseEntity<?> updateGymClass(@PathVariable Integer gymClass_id, @Valid @RequestBody GymClass gymClass) {
+        gymClassService.updateGymClass(gymClass_id, gymClass);
+        return ResponseEntity.status(200).body(new ApiResponse("GymClass Update"));
     }
 
     //      Delete GymClass
     @DeleteMapping("/delete/{gymClass_id}")
     public ResponseEntity<?> deleteGymClass(@PathVariable Integer gymClass_id) {
-        Boolean isDelete = gymClassService.deleteGymClass(gymClass_id);
-        if (isDelete) {
-            return ResponseEntity.status(200).body(new ApiResponse("GymClass delete"));
-        }
-        return ResponseEntity.status(404).body(new ApiResponse("Not found"));
+        gymClassService.deleteGymClass(gymClass_id);
+        return ResponseEntity.status(200).body(new ApiResponse("GymClass delete"));
     }
 
     // (Endpoints #7) Update gym class capacity (BUT not capacity is same).
     @PutMapping("/update-capacity/{gymClassId}/{newCapacity}")
     public ResponseEntity<?> updateCapacity(@PathVariable Integer gymClassId, @PathVariable Integer newCapacity) {
-        boolean isUpdated = gymClassService.updateCapacity(gymClassId, newCapacity);
-        if (!isUpdated) {
-            return ResponseEntity.status(404).body(new ApiResponse("GymClass not found or capacity is the same"));
-        }
+        gymClassService.updateCapacity(gymClassId, newCapacity);
         return ResponseEntity.ok(new ApiResponse("Capacity updated !"));
     }
 

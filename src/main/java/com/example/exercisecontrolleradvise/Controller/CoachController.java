@@ -25,39 +25,24 @@ public class CoachController {
 
     //     Add a new Coach
     @PostMapping("/add")
-    public ResponseEntity<?> addCoach(@Valid @RequestBody Coach coach, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(errors.getFieldError().getDefaultMessage());
-        }
-        boolean isAdded = coachService.addCoach(coach);
-        if (!isAdded) {
-            return ResponseEntity.status(404).body(new ApiResponse("Coach not be added!"));
-        }
+    public ResponseEntity<?> addCoach(@Valid @RequestBody Coach coach) {
+        coachService.addCoach(coach);
         return ResponseEntity.status(200).body(new ApiResponse("Coach added !!"));
     }
 
 
     //     Update Coach
     @PutMapping("/update/{coach_id}")
-    public ResponseEntity<?> updateCoach(@PathVariable Integer coach_id, @Valid @RequestBody Coach coach, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(errors.getFieldError().getDefaultMessage());
-        }
-        Boolean isUpdate = coachService.updateCoach(coach_id, coach);
-        if (isUpdate) {
-            return ResponseEntity.status(200).body(new ApiResponse("Coach Update"));
-        }
-        return ResponseEntity.status(404).body(new ApiResponse("Not found"));
+    public ResponseEntity<?> updateCoach(@PathVariable Integer coach_id, @Valid @RequestBody Coach coach) {
+        coachService.updateCoach(coach_id, coach);
+        return ResponseEntity.status(200).body(new ApiResponse("Coach Update"));
     }
 
     //      Delete Coach
     @DeleteMapping("/delete/{coach_id}")
     public ResponseEntity<?> deleteCoach(@PathVariable Integer coach_id) {
-        Boolean isDelete = coachService.deleteCoach(coach_id);
-        if (isDelete) {
-            return ResponseEntity.status(200).body(new ApiResponse("Coach delete"));
-        }
-        return ResponseEntity.status(404).body(new ApiResponse("Not found"));
+        coachService.deleteCoach(coach_id);
+        return ResponseEntity.status(200).body(new ApiResponse("Coach delete"));
     }
 
     // (Endpoints #4) Show the best coaches (ordered by experience )
@@ -69,20 +54,16 @@ public class CoachController {
     // (Endpoints #5) Update coach experience (if new experience is bigger.)
     @PutMapping("/update-experience/{coach_id}/{newYearsExperience}")
     public ResponseEntity<?> updateCoachExperience(@PathVariable Integer coach_id, @PathVariable Integer newYearsExperience) {
-        Coach updateCoach = coachService.updateCoachExperience(coach_id, newYearsExperience);
-        if (updateCoach == null) {
-            return ResponseEntity.status(404).body(new ApiResponse("Coach not found or experience not updated."));
-        }
+        coachService.updateCoachExperience(coach_id, newYearsExperience);
         return ResponseEntity.ok(new ApiResponse("Coach Update"));
     }
 
     // (Endpoints #6) Promote user to coach , change a user to a coach.(save new coach, and delete user.)
     @PostMapping("/promote/{userId}")
     public ResponseEntity<?> promoteUserToCoach(@PathVariable Integer userId) {
-        boolean check = coachService.promoteUserToCoach(userId);
-        if (check) {
-            return ResponseEntity.ok(new ApiResponse("User promoted to Coach successfully!"));
-        }
-        return ResponseEntity.status(404).body(new ApiResponse("Not found"));
+        coachService.promoteUserToCoach(userId);
+
+        return ResponseEntity.ok(new ApiResponse("User promoted to Coach successfully!"));
+
     }
 }

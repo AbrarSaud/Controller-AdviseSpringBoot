@@ -1,6 +1,7 @@
 package com.example.exercisecontrolleradvise.Service;
 
 
+import com.example.exercisecontrolleradvise.Api.ApiException;
 import com.example.exercisecontrolleradvise.Model.Coach;
 import com.example.exercisecontrolleradvise.Model.PersonalTraining;
 import com.example.exercisecontrolleradvise.Model.User;
@@ -28,44 +29,43 @@ public class PersonalTrainingService {
     }
 
     //     Add a new PersonalTraining
-    public boolean addPersonalTrainingPersonalTraining(PersonalTraining personalTraining) {
+    public void addPersonalTrainingPersonalTraining(PersonalTraining personalTraining) {
         User user = userRepository.findUserByUserId(personalTraining.getUserId());
         Coach coach = coachRepository.findCoachByCoachId(personalTraining.getCoachId());
         if (user == null || coach == null) {
-            return false;
+            throw new ApiException("User or Coach not found !");
         }
         if (personalTraining.getSubscriptionMonths() != 3 && personalTraining.getSubscriptionMonths() != 6) {
-            return false;
+            throw new ApiException(" months must be   3 or 6 !");
         }
         price(personalTraining);
         personalTrainingRepository.save(personalTraining);
-        return true;
+
     }
 
     //     Update a PersonalTraining
-    public Boolean updatePersonalTraining(Integer pt_id, PersonalTraining personalTraining) {
+    public void updatePersonalTraining(Integer pt_id, PersonalTraining personalTraining) {
         PersonalTraining oldPersonalTraining = personalTrainingRepository.findPersonalTrainingByPersonalTrainingId(pt_id);
         User user = userRepository.findUserByUserId((personalTraining.getUserId()));
         Coach coach = coachRepository.findCoachByCoachId(personalTraining.getCoachId());
         if (oldPersonalTraining == null || user != null || coach != null) {
-            return false;
+            throw new ApiException("not fond");
         }
         oldPersonalTraining.setStartDate(personalTraining.getStartDate());
         oldPersonalTraining.setSubscriptionMonths(personalTraining.getSubscriptionMonths());
         oldPersonalTraining.setPrice((personalTraining.getPrice()));
 
         personalTrainingRepository.save(oldPersonalTraining);
-        return true;
+
     }
 
     //     Delete a PersonalTraining
-    public Boolean deletePersonalTraining(Integer pt_id) {
+    public void deletePersonalTraining(Integer pt_id) {
         PersonalTraining deletePersonalTraining = personalTrainingRepository.findPersonalTrainingByPersonalTrainingId(pt_id);
         if (deletePersonalTraining == null) {
-            return false;
+            throw new ApiException("Not Found");
         }
         personalTrainingRepository.delete(deletePersonalTraining);
-        return true;
     }
 
     // (Endpoints #10) Get subscription information by personalTrainingId.
@@ -80,7 +80,8 @@ public class PersonalTrainingService {
             long daysLeft = endDate.toEpochDay() - today.toEpochDay();
             return "The subscription ends on: " + endDate + ", and there are " + daysLeft + " days left.";
         }
-        return null;
+        throw new ApiException("Personal Training not found");
+
     }
 
     // (Endpoints #11) Renew subscription by adding months.
@@ -89,10 +90,10 @@ public class PersonalTrainingService {
         User user = userRepository.findUserByUserId(personalTraining.getUserId());
         Coach coach = coachRepository.findCoachByCoachId(personalTraining.getCoachId());
         if (coach == null || user == null) {
-            return "User or Coach not found.";
+            throw new ApiException("User or Coach not found.");
         }
         if (months != 3 && months != 6) {
-            return "You can only renew for 3 or 6 months.";
+            throw new ApiException("You can only renew for 3 or 6 months");
         }
         personalTraining.setUserId(personalTraining.getUserId());
         personalTraining.setCoachId(personalTraining.getCoachId());
@@ -119,11 +120,9 @@ public class PersonalTrainingService {
     // (Endpoints #13) Freeze the subscription by pt_id.
     public String freezeSubscription(Integer pt_Id) {
         PersonalTraining personalTraining = personalTrainingRepository.findPersonalTrainingByPersonalTrainingId(pt_Id);
-
         if (personalTraining == null) {
-            return "Personal training not found.";
+            throw new ApiException("Personal training not found.");
         }
-
         personalTraining.setIsFreeze(true);
         personalTraining.setFreezeEndDate(LocalDate.now().plusDays(20));
         personalTrainingRepository.save(personalTraining);
@@ -131,31 +130,29 @@ public class PersonalTrainingService {
     }
 
     // (Endpoints #14) Change the old coach to new coach.
-    public boolean changeCoach(Integer ptId, Integer oldCoachId, Integer newCoachId) {
+    public void changeCoach(Integer ptId, Integer oldCoachId, Integer newCoachId) {
         PersonalTraining personalTraining = personalTrainingRepository.findPersonalTrainingByPersonalTrainingId(ptId);
         if (personalTraining == null) {
-            return false;
+            throw new ApiException("PersonalTraining  not found");
         }
         if (!personalTraining.getCoachId().equals(oldCoachId)) {
-            return false;
+            throw new ApiException(" Coach not found");
         }
-
         personalTraining.setCoachId(newCoachId);
         personalTrainingRepository.save(personalTraining);
-        return true;
     }
 
     // (Endpoints #15) Extend freeze days for a subscription.
     public String extendFreeze(Integer pt_Id, Integer extraDays) {
         PersonalTraining personalTraining = personalTrainingRepository.findPersonalTrainingByPersonalTrainingId(pt_Id);
         if (personalTraining == null) {
-            return "Personal training not found.";
+            throw new ApiException("Personal training not found.");
         }
         if (personalTraining.getFreezeEndDate() == null) {
-            return "No active freeze to extend.";
+            throw new ApiException("No active freeze to extend.");
         }
         if (extraDays > 14) {
-            return "Cannot extend freeze by more than 14 days.";
+            throw new ApiException("Cannot extend freeze by more than 14 days.");
         }
 
         personalTraining.setFreezeEndDate(personalTraining.getFreezeEndDate().plusDays(extraDays));

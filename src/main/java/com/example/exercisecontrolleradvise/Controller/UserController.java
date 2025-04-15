@@ -28,7 +28,7 @@ public class UserController {
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@Valid @RequestBody User user) {
         userService.addUser(user);
-        return ResponseEntity.status(404).body(new ApiResponse("User could not be added!"));
+        return ResponseEntity.status(200).body(new ApiResponse("User added!"));
     }
 
     //     Update User
